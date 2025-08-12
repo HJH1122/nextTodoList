@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { title } from "process";
-
+import { fetchATodo, deleteATodo, editATodo } from "@/data/firestore";
 
 export async function GET(request: NextRequest, {params} : {params: {slug : string}}){
 
@@ -8,14 +8,15 @@ export async function GET(request: NextRequest, {params} : {params: {slug : stri
 
     const query = searchParams.get('query');
 
+    const fetchedTodos = await fetchATodo(params.slug);
+
+    if(fetchedTodos === null){
+        return new Response(null, {status : 204});
+    }
+
     const response = {
         message: '단일 할일 가져오기 성공',
-        data: {
-            id: params.slug,
-            title: "오늘도 빡코딩!",
-            is_done: false,
-            query,
-        }
+        data: fetchedTodos
     }
 
 
@@ -25,14 +26,15 @@ export async function GET(request: NextRequest, {params} : {params: {slug : stri
 
 export async function DELETE(request: NextRequest, {params} : {params: {slug : string}}){
 
+    const deletedTodo =  await deleteATodo(params.slug);
+
+    if(deletedTodo === null){
+        return new Response(null, {status : 204});
+    }
 
     const response = {
         message: '단일 할일 삭제 성공',
-        data: {
-            id: params.slug,
-            title: "오늘도 빡코딩!",
-            is_done: false,
-        }
+        data: deletedTodo,
     }
 
 
@@ -43,10 +45,10 @@ export async function POST(request: NextRequest, {params} : {params: {slug : str
 
     const {title, is_done} = await request.json();
 
-    const editedTodo = {
-        id: params.slug,
-        title,
-        is_done,
+    const editedTodo = await editATodo(params.slug, {title, is_done});
+
+        if(editedTodo === null){
+        return new Response(null, {status : 204});
     }
 
     const response = {
