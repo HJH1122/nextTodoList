@@ -2,16 +2,19 @@ import { title } from "@/components/primitives";
 import TodosTable from "@/components/todos-table";
 
 async function fetchTodosApiCall(){
-  await new Promise(f => setTimeout(f, 1000));
-
-  return 10;
+  
+  const res = await fetch(`${process.env.BASE_URL}/api/todos/`, {cache:'no-store'});
+  return res.json();
 }
 
-export default function TodosPage() {
+export default async function TodosPage() {
+
+  const response = await fetchTodosApiCall();
+
   return (
     <div className="flex flex-col space-y-8">
       <h1 className={title()}>Todos</h1>
-      <TodosTable todos={[]}/>
+      <TodosTable todos={response.data ?? []}/>
     </div>
   );
 }
