@@ -1,5 +1,5 @@
 import {initializeApp} from 'firebase/app'
-import {getFireStorem, collection, getDocs, getDoc, setDoc, doc, TimeStamp, deleteDoc, updateDoc} from 'firebase/firestore'
+import {getFireStorem, collection, getDocs, getDoc, setDoc, doc, TimeStamp, deleteDoc, updateDoc, orderBy, query} from 'firebase/firestore'
 
 
 const firebaseConfig = {
@@ -16,7 +16,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFireStore(app);
 
 export async function fetchTodos(){
-    const querySnapshot = await getDocs(collection(db, "todos"));
+
+    const todosRef = collection(db, "todos");
+    
+    const descQuery = query(todosRef, orderBy("created_at", "desc"));
+    
+    const querySnapshot = await getDocs(descQuery);
 
     if(querySnapshot.empty){
         return [];
